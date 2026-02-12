@@ -1,0 +1,8 @@
+langgraph
+langchain
+langchain-groq
+langchain-experimental
+chainlit
+pydantic
+python-dotenv
+tiktoken

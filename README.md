@@ -1,6 +1,6 @@
-# 🧠 RLM-LangGraph
+# Fractal-Context
 
-> **Stop Context Rot.** A LangGraph implementation of Recursive Language Models.
+> **Stop Context Rot.** A LangGraph implementation of Recursive Language Models with Chainlit UI for real time UI visualization with near infinite context through self-similar agent recursion.
 
 An LLM agent that solves the "context rot" problem by **recursively spawning child agents** to process massive datasets. When the context is too large, the parent agent slices it and delegates chunks to sub-agents — each running as a nested LangGraph subgraph.
 
@@ -8,7 +8,7 @@ Built with a **Chainlit "Glass Box" UI** that visualizes recursion depth in real
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 | Feature | Description |
 |---------|-------------|
@@ -19,7 +19,7 @@ Built with a **Chainlit "Glass Box" UI** that visualizes recursion depth in real
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework:** LangGraph, LangChain
 - **UI:** Chainlit
@@ -28,7 +28,7 @@ Built with a **Chainlit "Glass Box" UI** that visualizes recursion depth in real
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone & Install
 
@@ -53,7 +53,7 @@ chainlit run ui/app.py
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 rlm-langgraph/
@@ -73,17 +73,9 @@ rlm-langgraph/
 
 ---
 
-## 🧪 How It Works
+## How It Works
 
-```mermaid
-graph TD
-    A[User Query + Large Context] --> B[Reason Node]
-    B -->|Context too large| C[Python REPL: Slice Text]
-    C --> D[delegate_subtask Tool]
-    D --> E[Child Agent depth+1]
-    E --> B
-    B -->|answer.ready = true| F[Return Answer]
-```
+![flow chart](docs/flow.png)
 
 1. User sends a query with a large document.
 2. The **Reason Node** evaluates if the context fits the LLM window.
@@ -93,8 +85,3 @@ graph TD
 6. Answers bubble up until `answer["ready"] == True`.
 
 ---
-
-## 📄 License
-
-MIT
-# fractal-context
