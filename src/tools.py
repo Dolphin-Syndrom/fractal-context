@@ -7,6 +7,7 @@ Core tools available to the LLM agent:
 """
 
 from langchain_core.tools import tool
+from langchain_experimental.tools import PythonREPLTool
 
 
 # ---------------------------------------------------------------------------
@@ -30,11 +31,23 @@ def get_app():
 
 
 # ---------------------------------------------------------------------------
+# Tool: Python REPL
+# ---------------------------------------------------------------------------
+
+python_repl = PythonREPLTool()
+
+
+# ---------------------------------------------------------------------------
 # Tool: delegate_subtask
 # ---------------------------------------------------------------------------
 
 @tool
-def delegate_subtask(sub_query: str, sub_context: str) -> str:
+def delegate_subtask(
+    sub_query: str,
+    sub_context: str,
+    current_depth: int = 0,
+    max_depth: int = 3,
+) -> str:
     """
     Delegate a sub-query to a child agent at depth + 1.
 
@@ -42,15 +55,43 @@ def delegate_subtask(sub_query: str, sub_context: str) -> str:
     The child agent receives a smaller chunk and returns its answer.
 
     Args:
-        sub_query:   The refined question for the child agent.
-        sub_context: The text chunk the child agent should analyze.
+        sub_query:     The refined question for the child agent.
+        sub_context:   The text chunk the child agent should analyze.
+        current_depth: The current recursion depth (passed from parent state).
+        max_depth:     Hard ceiling for recursion depth.
 
     Returns:
         The child agent's answer as a string.
     """
-    # TODO (Phase 2): Implement full recursion logic
-    # - Read current depth from parent state
-    # - Check depth < max_depth
-    # - Compile a new graph instance via get_app()
-    # - Invoke with incremented depth
-    return "[delegate_subtask] Not yet implemented — see Phase 2."
+    # --- Guard: prevent runaway recursion ---
+    if current_depth >= max_depth:
+        return (
+            f"[delegate_subtask] Max recursion depth ({max_depth}) reached. "
+            f"Returning sub_context summary at depth {current_depth}:\n"
+            f"{sub_context[:500]}"
+        )
+
+    # --- Compile a fresh sub-graph ---
+    app = get_app()
+    if app is None:
+        return "[delegate_subtask] Graph factory not registered — cannot recurse."
+
+    # --- Invoke child agent with incremented depth ---
+    child_state = {
+        "query": sub_query,
+        "context": sub_context,
+        "depth": current_depth + 1,
+        "max_depth": max_depth,
+        "answer": {"content": "", "ready": False},
+        "messages": [],
+    }
+
+    result = app.invoke(child_state)
+    return result.get("answer", {}).get("content", "[No answer from child agent]")
+
+
+# ---------------------------------------------------------------------------
+# Exported tool list (used by graph.py to bind to the LLM)
+# ---------------------------------------------------------------------------
+
+tools = [python_repl, delegate_subtask]

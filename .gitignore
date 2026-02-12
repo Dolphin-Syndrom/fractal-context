@@ -1,0 +1,39 @@
+# ─── Python ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ─── Environment & Secrets ────────────────────────────────
+.env
+.venv/
+venv/
+env/
+
+# ─── Chainlit ─────────────────────────────────────────────
+.chainlit/
+.files/
+
+# ─── IDE / Editor ─────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── OS ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Testing / Coverage ──────────────────────────────────
+.pytest_cache/
+htmlcov/
+.coverage
+*.cover
+
+# ─── Misc ─────────────────────────────────────────────────
+*.log
