@@ -57,6 +57,7 @@ async def on_message(message: cl.Message):
     # Priority: file attachment > "Context:" in text > raw message
     raw = message.content
     context = None
+    query = None
 
     # Check for file attachments
     if message.elements:
@@ -72,13 +73,17 @@ async def on_message(message: cl.Message):
                     await cl.Message(content=f"⚠️ Could not read file: {e}").send()
                 break
 
-    if context:
-        query = raw or "Analyze this file."
+    # Determine query and context based on what was provided
+    if context is not None:
+        # File was uploaded - use message as query
+        query = raw if raw.strip() else "Analyze this file."
     elif "Context:" in raw:
+        # "Context:" format - split it
         parts = raw.split("Context:", 1)
         query = parts[0].strip()
         context = parts[1].strip()
     else:
+        # Plain message - treat as both query and context
         query = raw
         context = raw
 
