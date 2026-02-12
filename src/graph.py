@@ -21,7 +21,7 @@ from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
 from src.state import RLMState
-from src.tools import tools, set_graph_factory
+from src.tools import tools, set_graph_factory, set_depth_context
 
 # ---------------------------------------------------------------------------
 # Load environment & initialise LLM
@@ -83,6 +83,9 @@ def reason_node(state: RLMState) -> dict:
         )
     )
 
+    # Pass current depth to tools module so delegate_subtask knows
+    set_depth_context(state["depth"], state["max_depth"])
+
     existing_messages = state.get("messages", [])
 
     if not existing_messages:
@@ -97,7 +100,16 @@ def reason_node(state: RLMState) -> dict:
         # human msg + AI response + tool results.
         messages = [sys_msg] + existing_messages
 
-    response = llm_with_tools.invoke(messages)
+    try:
+        response = llm_with_tools.invoke(messages)
+    except Exception as e:
+        # Groq can fail on malformed function calls — fall back to
+        # a direct answer without tools
+        fallback = llm.invoke(messages)
+        return {
+            "answer": {"content": fallback.content, "ready": True},
+            "messages": [fallback],
+        }
 
     # If the model did NOT emit tool calls, treat response as the final answer
     if not response.tool_calls:

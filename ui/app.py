@@ -54,10 +54,27 @@ async def on_message(message: cl.Message):
         return
 
     # Build the initial state
-    # Separate query from context: if the user includes "Context:" in their
-    # message, split on it.  Otherwise treat the whole message as the query.
+    # Priority: file attachment > "Context:" in text > raw message
     raw = message.content
-    if "Context:" in raw:
+    context = None
+
+    # Check for file attachments
+    if message.elements:
+        for elem in message.elements:
+            if hasattr(elem, "path") and elem.path:
+                try:
+                    with open(elem.path, "r", encoding="utf-8") as f:
+                        context = f.read()
+                    await cl.Message(
+                        content=f"📎 Loaded file: **{elem.name}** ({len(context):,} chars)"
+                    ).send()
+                except Exception as e:
+                    await cl.Message(content=f"⚠️ Could not read file: {e}").send()
+                break
+
+    if context:
+        query = raw or "Analyze this file."
+    elif "Context:" in raw:
         parts = raw.split("Context:", 1)
         query = parts[0].strip()
         context = parts[1].strip()
