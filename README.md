@@ -33,16 +33,16 @@ Built with a **Chainlit "Glass Box" UI** that visualizes recursion depth in real
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-username/rlm-langgraph.git
-cd rlm-langgraph
+git clone https://github.com/Dolphin-Syndrom/fractal-context.git
+cd fractal-context
 pip install -r requirements.txt
 ```
 
 ### 2. Configure API Key
 
 ```bash
-cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+# Create a .env file and add your Groq API key
+echo GROQ_API_KEY=your_key_here > .env
 ```
 
 ### 3. Run the UI
@@ -56,19 +56,23 @@ chainlit run ui/app.py
 ## Project Structure
 
 ```
-rlm-langgraph/
+fractal-context/
 ├── src/
-│   ├── __init__.py       # Package init
-│   ├── state.py          # RLMState TypedDict (graph memory)
-│   ├── tools.py          # REPL + recursive delegation tools
-│   ├── graph.py          # Main StateGraph definition
-│   └── utils.py          # File loading & text splitting
+│   ├── __init__.py              # Package init
+│   ├── state.py                 # RLMState TypedDict (graph memory)
+│   ├── tools.py                 # REPL + recursive delegation tools
+│   ├── graph.py                 # Main StateGraph definition
+│   └── utils.py                 # File loading & text splitting
 ├── ui/
-│   └── app.py            # Chainlit entry point
-├── tests/                # Unit tests
+│   └── app.py                   # Chainlit entry point (supports file uploads)
+├── tests/
+│   ├── generate_test_data.py    # Creates needle-in-haystack test file
+│   └── test_needle.py           # Standalone validation script
+├── docs/
+│   └── flow.png                 # Architecture flow diagram
 ├── README.md
 ├── requirements.txt
-└── .env                  # API keys (not committed)
+└── .env                         # API keys (not committed)
 ```
 
 ---
